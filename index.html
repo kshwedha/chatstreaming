@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+   <meta charset="UTF-8">
+
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+   <title>Streaming Example</title>
+
+   <style>
+
+       body {
+
+           font-family: Arial, sans-serif;
+
+       }
+
+       #output {
+
+           white-space: pre-wrap;
+
+           font-family: monospace;
+
+           border: 1px solid #ccc;
+
+           padding: 10px;
+
+           margin-top: 20px;
+
+       }
+
+   </style>
+
+</head>
+
+<body>
+
+   <h1>Text Streaming Example</h1>
+
+   <button id="start">Start Streaming</button>
+
+   <div id="output"></div>
+
+
+
+   <script>
+
+       document.getElementById('start').addEventListener('click', async () => {
+
+           const output = document.getElementById('output');
+
+           output.textContent = ''; // Clear previous output
+
+
+
+           try {
+
+               const response = await fetch('http://127.0.0.1:8080/stream', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'text/plain'
+                }
+               });
+
+               if (!response.ok) {
+                throw new Error('Network response was not ok.')
+               }
+
+               const reader = response.body.getReader();
+
+               const decoder = new TextDecoder();
+
+
+
+               while (true) {
+
+                   const { done, value } = await reader.read();
+
+                   if (done) break;
+
+                   output.textContent += decoder.decode(value, { stream: true });
+
+               }
+
+           } catch (error) {
+
+               console.error('Fetch failed:', error);
+
+           }
+
+       });
+
+   </script>
+
+</body>
+
+</html>
+
